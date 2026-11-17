@@ -1,0 +1,119 @@
+--- a/templates/smart_clinic/html/com_content/article/default.php
++++ b/templates/smart_clinic/html/com_content/article/default.php
+@@ -43,6 +43,31 @@
+ $useArticleHero = $params->get('access-view') && $params->get('show_title') && !$showPageHeading
+     && (int) $this->item->state === ContentComponent::CONDITION_PUBLISHED && !$isNotPublishedYet && !$isExpired;
+ 
++$heroVideo = null;
++$heroVideoFieldId = null;
++
++$articleImages = json_decode((string) $this->item->images, true) ?: [];
++$hasChosenCover = empty($this->item->dharmavideoCover)
++    && (trim((string) ($articleImages['image_intro'] ?? '')) !== ''
++        || trim((string) ($articleImages['image_fulltext'] ?? '')) !== '');
++if ($params->get('access-view') && !$hasChosenCover) {
++    foreach ($this->item->jcfields ?? [] as $field) {
++        if ($field->type !== 'dharmavideo' || (int) $field->params->get('display', 2) !== 0
++            || empty($field->dharmavideoItems) || str_contains((string) $this->item->text, trim((string) $field->value))) {
++            continue;
++        }
++
++        $heroVideo = [
++            'video' => $field->dharmavideoItems[0],
++            'playerMode' => $field->fieldparams->get('player_mode', 'inline'),
++            'group' => 'dharmavideo-hero-' . (int) $this->item->id,
++        ];
++        $heroVideoFieldId = (int) $field->id;
++
++        break;
++    }
++}
++
+ SiteAssets::enable();
+ ?>
+ <div class="com-content-article item-page<?php echo $this->pageclass_sfx; ?>">
+@@ -74,26 +99,26 @@
+         $app->getLanguage()->load('com_dharmaclinic', JPATH_SITE);
+ 
+         $item = $this->item;
+-        $images = json_decode((string) $item->images, true) ?: [];
+-        $image = trim((string) ($images['image_fulltext'] ?? ''));
+-        $alt = (string) ($images['image_fulltext_alt'] ?? '');
+-        $caption = (string) ($images['image_fulltext_caption'] ?? '');
++        $image = trim((string) ($articleImages['image_fulltext'] ?? ''));
++        $alt = (string) ($articleImages['image_fulltext_alt'] ?? '');
++        $caption = (string) ($articleImages['image_fulltext_caption'] ?? '');
+ 
+         if ($image === '') {
+-            $image = trim((string) ($images['image_intro'] ?? ''));
+-            $alt = (string) ($images['image_intro_alt'] ?? '');
+-            $caption = (string) ($images['image_intro_caption'] ?? '');
++            $image = trim((string) ($articleImages['image_intro'] ?? ''));
++            $alt = (string) ($articleImages['image_intro_alt'] ?? '');
++            $caption = (string) ($articleImages['image_intro_caption'] ?? '');
+         }
+ 
++        $hasHeroMedia = $heroVideo !== null || $image !== '';
+         $date = $item->publish_up ?: $item->created;
+         $author = trim((string) ($item->created_by_alias ?: ($params->get('show_author') ? $item->author : '')));
+         $publication = $author !== '' ? Text::sprintf('COM_CONTENT_WRITTEN_BY', $author) : $app->get('sitename');
+         $question = FormButton::render('question', Text::_('COM_DHARMACLINIC_FORM_BUTTON_QUESTION'), [], SiteAssets::buttonClass('primary') . ' knopka--compact mw-100');
+         ?>
+         <div class="dc-scope mb-4">
+-            <header class="dc-top dc-hero<?php echo $image !== '' ? ' dc-hero--photo d-block' : ''; ?>" aria-labelledby="clinic-news-title">
++            <header class="dc-top dc-hero<?php echo $hasHeroMedia ? ' dc-hero--photo d-block' : ''; ?>" aria-labelledby="clinic-news-title">
+                 <div class="row align-items-center g-4">
+-                    <div class="<?php echo $image !== '' ? 'col-12 col-lg-6' : 'col-12'; ?>">
++                    <div class="<?php echo $hasHeroMedia ? 'col-12 col-lg-6' : 'col-12'; ?>">
+                         <div class="dc-hero__body text-break">
+                             <h1 class="h1 fw-bold mb-3" id="clinic-news-title"><?php echo $this->escape($item->title); ?></h1>
+                             <ul class="list-unstyled d-flex flex-wrap column-gap-4 row-gap-2 mb-3">
+@@ -121,7 +146,11 @@
+                             <?php echo $question; ?>
+                         </div>
+                     </div>
+-                    <?php if ($image !== '') : ?>
++                    <?php if ($heroVideo !== null) : ?>
++                        <div class="col-12 col-lg-6">
++                            <?php echo LayoutHelper::render('clinic-article-video-player', $heroVideo, JPATH_THEMES . '/smart_clinic/html/layouts'); ?>
++                        </div>
++                    <?php elseif ($image !== '') : ?>
+                         <figure class="col-12 col-lg-6 mb-0">
+                             <div class="dc-hero__photo ratio ratio-16x9">
+                                 <?php echo LayoutHelper::render('joomla.html.image', [
+@@ -185,7 +214,11 @@
+         <?php echo $this->loadTemplate('links'); ?>
+     <?php endif; ?>
+     <?php if ($params->get('access-view')) : ?>
+-        <?php if (!$useArticleHero) : ?>
++        <?php if ($heroVideo !== null && (!$useArticleHero || !empty($compactArticleLayout))) : ?>
++            <div class="dc-scope mb-4">
++                <?php echo LayoutHelper::render('clinic-article-video-player', $heroVideo, JPATH_THEMES . '/smart_clinic/html/layouts'); ?>
++            </div>
++        <?php elseif (!$useArticleHero || (!empty($compactArticleLayout) && !empty($this->item->dharmavideoCover))) : ?>
+             <?php echo LayoutHelper::render('joomla.content.full_image', $this->item); ?>
+         <?php endif; ?>
+         <?php
+@@ -223,6 +256,8 @@
+             <?php break; ?>
+         <?php endforeach; ?>
+ 
++        <?php echo LayoutHelper::render('clinic-article-videos', ['item' => $this->item, 'heroVideoFieldId' => $heroVideoFieldId], JPATH_THEMES . '/smart_clinic/html/layouts'); ?>
++
+         <?php if ($info == 1 || $info == 2) : ?>
+             <?php if (!$useArticleHero && $useDefList) : ?>
+                 <?php echo LayoutHelper::render('joomla.content.info_block', ['item' => $this->item, 'params' => $params, 'position' => 'below']); ?>
+--- a/templates/smart_clinic/html/com_content/article/landing.php
++++ b/templates/smart_clinic/html/com_content/article/landing.php
+@@ -38,7 +38,11 @@
+         </div>
+         <?php echo $item->event->afterDisplayTitle; ?>
+         <?php echo $item->event->beforeDisplayContent; ?>
++        <?php if (!empty($item->dharmavideoCover)) : ?>
++            <?php echo LayoutHelper::render('joomla.content.full_image', $item); ?>
++        <?php endif; ?>
+         <?php echo $item->text; ?>
++        <?php echo LayoutHelper::render('clinic-article-videos', ['item' => $item], JPATH_THEMES . '/smart_clinic/html/layouts'); ?>
+         <?php echo $item->event->afterDisplayContent; ?>
+     <?php endif; ?>
+ </div>

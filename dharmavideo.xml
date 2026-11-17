@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="plugin" group="fields" method="upgrade">
+    <name>PLG_FIELDS_DHARMAVIDEO</name>
+    <author>web design dharma</author>
+    <version>1.0.0</version>
+    <license>GNU General Public License version 2 or later</license>
+    <description>PLG_FIELDS_DHARMAVIDEO_XML_DESCRIPTION</description>
+    <namespace path="src">Dharma\Plugin\Fields\Dharmavideo</namespace>
+    <files>
+        <folder plugin="dharmavideo">services</folder>
+        <folder>src</folder>
+        <folder>params</folder>
+        <folder>tmpl</folder>
+        <folder>layouts</folder>
+        <filename>LICENSE</filename>
+    </files>
+    <media destination="plg_fields_dharmavideo" folder="media">
+        <folder>css</folder>
+        <folder>js</folder>
+    </media>
+    <languages folder="language">
+        <language tag="ru-RU">ru-RU/plg_fields_dharmavideo.ini</language>
+        <language tag="ru-RU">ru-RU/plg_fields_dharmavideo.sys.ini</language>
+        <language tag="en-GB">en-GB/plg_fields_dharmavideo.ini</language>
+        <language tag="en-GB">en-GB/plg_fields_dharmavideo.sys.ini</language>
+    </languages>
+</extension>

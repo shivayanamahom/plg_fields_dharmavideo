@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form>
+    <fields name="fieldparams">
+        <fieldset name="fieldparams">
+            <field name="player_mode" type="list" validate="options" default="inline"
+                label="PLG_FIELDS_DHARMAVIDEO_MODE" description="PLG_FIELDS_DHARMAVIDEO_MODE_DESC">
+                <option value="inline">PLG_FIELDS_DHARMAVIDEO_MODE_INLINE</option>
+                <option value="fancybox">PLG_FIELDS_DHARMAVIDEO_MODE_FANCYBOX</option>
+            </field>
+        </fieldset>
+    </fields>
+</form>

@@ -1,0 +1,39 @@
+.dharmavideo-item {
+    min-inline-size: 0;
+}
+
+.dharmavideo-launch {
+    display: block;
+}
+
+.dharmavideo-play {
+    background: rgb(0 0 0 / .74);
+}
+
+.dharmavideo-launch:is(:hover, :focus-visible) .dharmavideo-play {
+    background: #000;
+}
+
+.dharmavideo-player {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border: 0;
+    border-radius: var(--bs-border-radius, .375rem);
+    background: #151515;
+}
+
+.dharmavideo-editor [data-dharmavideo-player]:not(:empty),
+.dharmavideo-editor [data-dharmavideo-status]:not(:empty) {
+    margin-top: .5rem;
+}
+
+.dharmavideo-editor [data-dharmavideo-player] {
+    max-width: 32rem;
+}
+
+.fancybox__container.dharmavideo-lightbox {
+    --f-html-padding: 0;
+    --f-html-bg: transparent;
+}
