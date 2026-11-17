@@ -61,14 +61,14 @@ final class VideoProvider
             ];
         }
 
-        if (!in_array($host, ['vk.com', 'www.vk.com', 'm.vk.com', 'vkvideo.ru', 'www.vkvideo.ru', 'm.vkvideo.ru'], true)) {
+        if (!in_array($host, ['vk.com', 'www.vk.com', 'm.vk.com', 'vk.ru', 'www.vk.ru', 'm.vk.ru', 'vkvideo.ru', 'www.vkvideo.ru', 'm.vkvideo.ru'], true)) {
             return null;
         }
 
         $id = '';
         if ($path === '/video_ext.php' && is_string($query['oid'] ?? null) && is_string($query['id'] ?? null)) {
             $id = $query['oid'] . '_' . $query['id'];
-        } elseif (preg_match('~^/video(-?[0-9]+_[0-9]+)$~D', $path, $match)) {
+        } elseif (preg_match('~^/(?:video|clip)(-?[0-9]+_[0-9]+)$~D', $path, $match)) {
             $id = $match[1];
         } elseif (is_string($query['z'] ?? null)
             && preg_match('~^video(-?[0-9]+_[0-9]+)(?:/[^\r\n]*)?$~D', $query['z'], $match)) {

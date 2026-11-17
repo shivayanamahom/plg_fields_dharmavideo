@@ -2,10 +2,13 @@
 <extension type="plugin" group="fields" method="upgrade">
     <name>PLG_FIELDS_DHARMAVIDEO</name>
     <author>web design dharma</author>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <license>GNU General Public License version 2 or later</license>
     <description>PLG_FIELDS_DHARMAVIDEO_XML_DESCRIPTION</description>
     <namespace path="src">Dharma\Plugin\Fields\Dharmavideo</namespace>
+    <updateservers>
+        <server type="extension" priority="1" name="Dharma Video Updates">https://raw.githubusercontent.com/shivayanamahom/plg_fields_dharmavideo/main/updates.xml</server>
+    </updateservers>
     <files>
         <folder plugin="dharmavideo">services</folder>
         <folder>src</folder>
